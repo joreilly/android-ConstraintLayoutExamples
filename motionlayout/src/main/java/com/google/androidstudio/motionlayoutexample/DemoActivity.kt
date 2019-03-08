@@ -18,7 +18,9 @@ package com.google.androidstudio.motionlayoutexample
 
 import android.os.Build
 import android.os.Bundle
+import android.support.annotation.IdRes
 import android.support.annotation.RequiresApi
+import android.support.constraint.ConstraintSet
 import android.support.constraint.motion.MotionLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -45,7 +47,14 @@ class DemoActivity : AppCompatActivity() {
         } else {
             MotionLayout.DEBUG_SHOW_NONE
         }
-        (container as? MotionLayout)?.setDebugMode(debugMode)
+        val motionLayout = container as MotionLayout
+        motionLayout.setDebugMode(MotionLayout.DEBUG_SHOW_PROGRESS)
+
+        val accumulativeListener = AccumulativeTransitionListener()
+        motionLayout.setTransitionListener(accumulativeListener)
+
+
+
     }
 
     fun changeState(v: View?) {
@@ -57,3 +66,112 @@ class DemoActivity : AppCompatActivity() {
         }
     }
 }
+
+
+
+open class TransitionListener: MotionLayout.TransitionListener {
+
+    /**
+     * Called when a transition has been completed
+     */
+    override fun onTransitionCompleted(view: MotionLayout, @IdRes constraintSetId: Int) = Unit
+
+    /**
+     * Called when a [KeyTrigger] is triggered
+     */
+    override fun onTransitionTrigger(view: MotionLayout, @IdRes triggerId: Int, isPositive: Boolean, progress: Float) = Unit
+
+    /**
+     * Called when a transition has been started
+     */
+    @Deprecated("This is not being called due to a bug in MotionLayout. This will be fixed in Alpha 4.")
+    override fun onTransitionStarted(view: MotionLayout, @IdRes startConstraintSetId: Int, @IdRes endConstraintSetId: Int) = Unit
+
+    /**
+     * Called when the transition or its progress changes
+     */
+    override fun onTransitionChange(view: MotionLayout, @IdRes startConstraintSetId: Int, @IdRes endConstraintSetId: Int, progress: Float) = Unit
+}
+
+
+
+class AccumulativeTransitionListener: TransitionListener() {
+
+    var didApplyConstraintSet = false
+
+    override fun onTransitionChange(view: MotionLayout, @IdRes startConstraintSetId: Int, @IdRes endConstraintSetId: Int, progress: Float) {
+        if (!didApplyConstraintSet) {
+            // Let's retrieve our ConstraintSets first
+            val startConstraintSet = view.getConstraintSet(startConstraintSetId)
+            val endConstraintSet = view.getConstraintSet(endConstraintSetId)
+            // Merge them (using an extension function)
+            val mergedConstraintSet = startConstraintSet + endConstraintSet
+            // Clear + Set them
+            endConstraintSet.setConstraints(mergedConstraintSet)
+            didApplyConstraintSet = true
+        }
+    }
+
+    override fun onTransitionCompleted(view: MotionLayout, @IdRes constraintSetId: Int) {
+        didApplyConstraintSet = false
+    }
+
+}
+
+
+/**
+ * Merges two [ConstraintSet]s. If a Constraint exists in the first [ConstraintSet] and the second one, the original value will be replaced by the new value.
+ */
+operator fun ConstraintSet.plus(other: ConstraintSet): ConstraintSet {
+    this.updateWith(other)
+    return this.copy()
+}
+
+/**
+ * Clears the existing constraints and sets them to those of the [constraintSet]
+ */
+fun ConstraintSet.setConstraints(constraintSet: ConstraintSet) {
+    val field = ConstraintSet::class.java.getDeclaredField("mConstraints")
+    field.isAccessible = true
+
+    val theseConstraints: HashMap<Int, Any> = field.get(this) as HashMap<Int, Any>
+    val newConstraints: HashMap<Int, Any> = field.get(constraintSet) as HashMap<Int, Any>
+
+    theseConstraints.clear()
+    theseConstraints.putAll(newConstraints)
+}
+
+/**
+ * Copies the [ConstraintSet] into a new [ConstraintSet]
+ */
+fun ConstraintSet.copy(): ConstraintSet = ConstraintSet().apply { clone(this@copy) }
+
+/**
+ * Clears the constraints of this [ConstraintSet] using reflection
+ */
+@Suppress("UNCHECKED_CAST")
+fun ConstraintSet.clearConstraints() {
+    val field = ConstraintSet::class.java.getDeclaredField("mConstraints")
+    field.isAccessible = true
+
+    val theseConstraints: HashMap<Int, Any> = field.get(this) as HashMap<Int, Any>
+    theseConstraints.clear()
+}
+
+/**
+ * Mutates the [ConstraintSet] with the values from the [other] [ConstraintSet]
+ * @see https://github.com/tristanvda/ConstraintSet-UpdateWith
+ */
+@Suppress("UNCHECKED_CAST")
+fun ConstraintSet.updateWith(other: ConstraintSet) {
+
+    val field = ConstraintSet::class.java.getDeclaredField("mConstraints")
+    field.isAccessible = true
+
+    val theseConstraints: HashMap<Int, Any> = field.get(this) as HashMap<Int, Any>
+    val newConstraints: HashMap<Int, Any> = field.get(other) as HashMap<Int, Any>
+
+    theseConstraints.putAll(newConstraints)
+}
+
+
