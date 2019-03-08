@@ -27,7 +27,7 @@ import android.view.View
 import android.widget.ImageView
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP) // for View#clipToOutline
-class DemoActivity : AppCompatActivity() {
+class DemoActivity: AppCompatActivity() {
 
     private lateinit var container: View
 
@@ -54,7 +54,6 @@ class DemoActivity : AppCompatActivity() {
         motionLayout.setTransitionListener(accumulativeListener)
 
 
-
     }
 
     fun changeState(v: View?) {
@@ -66,7 +65,6 @@ class DemoActivity : AppCompatActivity() {
         }
     }
 }
-
 
 
 open class TransitionListener: MotionLayout.TransitionListener {
@@ -92,7 +90,6 @@ open class TransitionListener: MotionLayout.TransitionListener {
      */
     override fun onTransitionChange(view: MotionLayout, @IdRes startConstraintSetId: Int, @IdRes endConstraintSetId: Int, progress: Float) = Unit
 }
-
 
 
 class AccumulativeTransitionListener: TransitionListener() {
@@ -121,10 +118,10 @@ class AccumulativeTransitionListener: TransitionListener() {
 
 /**
  * Merges two [ConstraintSet]s. If a Constraint exists in the first [ConstraintSet] and the second one, the original value will be replaced by the new value.
+ * This doesn't mutate the original ConstraintSet, but rather creates a copy.
  */
 operator fun ConstraintSet.plus(other: ConstraintSet): ConstraintSet {
-    this.updateWith(other)
-    return this.copy()
+    return this.copy().apply { updateWith(other) }
 }
 
 /**
