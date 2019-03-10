@@ -21,15 +21,22 @@ import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.annotation.RequiresApi
 import android.support.constraint.ConstraintSet
+import android.support.constraint.motion.Debug
 import android.support.constraint.motion.MotionLayout
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import kotlinx.android.synthetic.main.motion_26_multistate.arrow_right
+import kotlinx.android.synthetic.main.motion_26_multistate.arrow_up
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP) // for View#clipToOutline
 class DemoActivity: AppCompatActivity() {
 
     private lateinit var container: View
+
+    private var dialShown = false
+    private var peoplehown = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +60,29 @@ class DemoActivity: AppCompatActivity() {
         val accumulativeListener = AccumulativeTransitionListener()
         motionLayout.setTransitionListener(accumulativeListener)
 
+
+        //motionLayout.setState(R.id.base_state, 0, 0)
+
+        arrow_up.setOnClickListener {
+            if (!dialShown) {
+                motionLayout.transitionToState(R.id.dial)
+            } else {
+                motionLayout.transitionToState(R.id.dial_hidden)
+            }
+            dialShown = !dialShown
+        }
+
+
+
+        arrow_right.setOnClickListener {
+            if (!peoplehown) {
+                motionLayout.transitionToState(R.id.people)
+            } else {
+                motionLayout.transitionToState(R.id.people_hidden)
+            }
+
+            peoplehown = !peoplehown
+        }
 
     }
 
@@ -96,15 +126,35 @@ class AccumulativeTransitionListener: TransitionListener() {
 
     var didApplyConstraintSet = false
 
-    override fun onTransitionChange(view: MotionLayout, @IdRes startConstraintSetId: Int, @IdRes endConstraintSetId: Int, progress: Float) {
+
+    override fun onTransitionStarted(view: MotionLayout, @IdRes startConstraintSetId: Int, @IdRes endConstraintSetId: Int) {
+        Log.d("JFOR", "onTransitionStarted")
+    }
+
+    override fun onTransitionChange(motionLayout: MotionLayout, @IdRes startConstraintSetId: Int, @IdRes endConstraintSetId: Int, progress: Float) {
         if (!didApplyConstraintSet) {
+
+
+
             // Let's retrieve our ConstraintSets first
-            val startConstraintSet = view.getConstraintSet(startConstraintSetId)
-            val endConstraintSet = view.getConstraintSet(endConstraintSetId)
+            val startStateStr = Debug.getState(motionLayout, startConstraintSetId)
+            val startConstraintSet = motionLayout.getConstraintSet(startConstraintSetId)
+
+
+
+            val endStateStr = Debug.getState(motionLayout, endConstraintSetId)
+            val endConstraintSet = motionLayout.getConstraintSet(endConstraintSetId)
+
+
+            Log.d("JFOR", "start state = ${startStateStr}, end state = ${endStateStr}")
+
+
             // Merge them (using an extension function)
             val mergedConstraintSet = startConstraintSet + endConstraintSet
             // Clear + Set them
             endConstraintSet.setConstraints(mergedConstraintSet)
+
+
             didApplyConstraintSet = true
         }
     }

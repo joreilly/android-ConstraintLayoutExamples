@@ -19,33 +19,36 @@
     <Transition
         motion:constraintSetStart ="@id/base_state"
         motion:constraintSetEnd="@id/dial"
-        motion:duration="3000">
-        <OnSwipe
-            motion:dragDirection="dragUp"
-            motion:touchAnchorId="@id/dial_pad"
-            motion:touchAnchorSide="top" />
+        motion:duration="1000">
     </Transition>
 
     <Transition
         motion:constraintSetStart="@id/base_state"
         motion:constraintSetEnd="@id/people"
-        motion:duration="3000">
-        <OnSwipe
-            motion:dragDirection="dragRight"
-            motion:touchAnchorId="@id/people_pad"
-            motion:touchAnchorSide="right" />
+        motion:duration="1000">
     </Transition>
 
 
     <Transition
         motion:constraintSetStart ="@id/people"
         motion:constraintSetEnd="@id/dial"
-        motion:duration="3000">
-        <OnSwipe
-            motion:dragDirection="dragUp"
-            motion:touchAnchorId="@id/dial_pad"
-            motion:touchAnchorSide="top" />
+        motion:duration="1000">
     </Transition>
+
+
+    <Transition
+        motion:constraintSetStart ="@id/people"
+        motion:constraintSetEnd="@id/people_hidden"
+        motion:duration="1000">
+    </Transition>
+
+
+    <Transition
+        motion:constraintSetStart ="@id/people_hidden"
+        motion:constraintSetEnd="@id/dial"
+        motion:duration="3000">
+    </Transition>
+
 
 
     <ConstraintSet android:id="@+id/base_state">
@@ -53,7 +56,6 @@
             <Layout
                 motion:layout_width="0dp"
                 motion:layout_height="300dp"
-                motion:layout_marginTop="-16dp"
                 motion:layout_constraintEnd_toEndOf="parent"
                 motion:layout_constraintStart_toStartOf="parent"
                 motion:layout_constraintTop_toBottomOf="parent" />
@@ -63,75 +65,69 @@
             <Layout
                 motion:layout_width="300dp"
                 motion:layout_height="500dp"
-                motion:layout_marginStart="-12dp"
                 motion:layout_constraintBottom_toBottomOf="parent"
                 motion:layout_constraintEnd_toStartOf="parent"
                 motion:layout_constraintTop_toTopOf="parent" />
         </Constraint>
 
-        <Constraint android:id="@id/arrow_right">
+    </ConstraintSet>
+
+
+
+    <ConstraintSet android:id="@+id/dial_hidden">
+
+        <Constraint android:id="@id/dial_pad">
             <Layout
-                motion:layout_width="wrap_content"
-                motion:layout_height="wrap_content"
-                motion:layout_constraintTop_toTopOf="parent"
-                motion:layout_constraintBottom_toBottomOf="parent"
+                motion:layout_width="0dp"
+                motion:layout_height="150dp"
+                motion:layout_constraintEnd_toEndOf="parent"
                 motion:layout_constraintStart_toStartOf="parent"
-                />
+                motion:layout_constraintTop_toBottomOf="parent" />
         </Constraint>
 
-        <Constraint android:id="@id/arrow_up">
-            <Layout
-                motion:layout_width="wrap_content"
-                motion:layout_height="wrap_content"
-                motion:layout_constraintBottom_toBottomOf="parent"
-                motion:layout_constraintStart_toStartOf="parent"
-                motion:layout_constraintEnd_toEndOf="parent"
-                />
-        </Constraint>
     </ConstraintSet>
+
 
     <ConstraintSet android:id="@+id/dial">
 
         <Constraint android:id="@id/dial_pad">
             <Layout
                 motion:layout_width="0dp"
-                motion:layout_height="500dp"
+                motion:layout_height="150dp"
+                android:layout_marginBottom="30dp"
                 motion:layout_constraintBottom_toBottomOf="parent"
                 motion:layout_constraintEnd_toEndOf="parent"
                 motion:layout_constraintStart_toStartOf="parent" />
         </Constraint>
 
-        <Constraint android:id="@id/arrow_up">
-            <Layout
-                motion:layout_width="wrap_content"
-                motion:layout_height="wrap_content"
-                motion:layout_constraintTop_toBottomOf="parent"
-                motion:layout_constraintStart_toStartOf="parent"
-                motion:layout_constraintEnd_toEndOf="parent"
-                />
-        </Constraint>
+
     </ConstraintSet>
+
+
+    <ConstraintSet android:id="@+id/people_hidden">
+
+        <Constraint android:id="@id/people_pad">
+            <Layout
+                motion:layout_width="300dp"
+                motion:layout_height="150dp"
+                motion:layout_constraintEnd_toStartOf="parent"
+                motion:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+
+    </ConstraintSet>
+
 
     <ConstraintSet android:id="@+id/people">
 
         <Constraint android:id="@id/people_pad">
             <Layout
                 motion:layout_width="360dp"
-                motion:layout_height="600dp"
-                motion:layout_constraintBottom_toBottomOf="parent"
+                motion:layout_height="150dp"
+                android:layout_marginBottom="20dp"
                 motion:layout_constraintStart_toStartOf="parent"
                 motion:layout_constraintTop_toTopOf="parent" />
         </Constraint>
 
-        <Constraint android:id="@id/arrow_right">
-            <Layout
-                motion:layout_width="wrap_content"
-                motion:layout_height="wrap_content"
-                motion:layout_constraintTop_toTopOf="parent"
-                motion:layout_constraintBottom_toBottomOf="parent"
-                motion:layout_constraintEnd_toStartOf="parent"
-                />
-        </Constraint>
     </ConstraintSet>
 
 
